@@ -34,7 +34,7 @@
   "minimum-stability": "stable",
   "require": {
     "php": ">=7.4",
-    "stellarwp/models": "^2.0",
+    "stellarwp/models": "dev-feat/introduce-schema-model",
     "stellarwp/schema": "^3.0"
   },
   "require-dev": {
