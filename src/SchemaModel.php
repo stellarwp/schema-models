@@ -255,10 +255,10 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	 * @since 2.0.0
 	 *
 	 * @param string $key Relationship name.
-	 * @param mixed $value Relationship value.
+	 * @param mixed  $value Relationship value.
 	 */
 	protected function setRelationship( string $key, $value ): void {
-		$old_value = $this->relationshipData[ $key ]['current'] ?? null;
+		$old_value                                 = $this->relationshipData[ $key ]['current'] ?? null;
 		$this->relationshipData[ $key ]['current'] = $value;
 
 		if ( $old_value ) {
@@ -494,10 +494,10 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	 * Constructs a model instance from database query data.
 	 *
 	 * @param object|array $queryData
-	 * @param int $mode The level of strictness to take when constructing the object, by default it will ignore extra keys but error on missing keys.
+	 * @param int          $mode The level of strictness to take when constructing the object, by default it will ignore extra keys but error on missing keys.
 	 * @return static
 	 */
-	public static function fromData($data, $mode = self::BUILD_MODE_IGNORE_EXTRA) {
+	public static function fromData( $data, $mode = self::BUILD_MODE_IGNORE_EXTRA ) {
 		if ( ! is_object( $data ) && ! is_array( $data ) ) {
 			throw new InvalidArgumentException( 'Query data must be an object or array' );
 		}
@@ -506,7 +506,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 
 		$model = new static();
 
-		foreach (static::propertyKeys() as $key) {
+		foreach ( static::propertyKeys() as $key ) {
 			$property_definition = static::getPropertyDefinition( $key );
 			if ( $key !== $model->getPrimaryColumn() && ! array_key_exists( $key, $data ) && ! $property_definition->hasDefault() ) {
 				throw new InvalidArgumentException( "Property '$key' does not exist." );
