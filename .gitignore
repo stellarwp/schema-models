@@ -1,0 +1,28 @@
+composer.lock
+vendor/
+tests/_support/_generated
+
+# Dev tools
+.buildpath
+*.iml
+.project
+.idea/
+.vscode/
+
+# Third party dependencies
+vendor/
+
+# Tests
+codeception.yml
+tests/_output/*
+tests/*.suite.yml
+!tests/_data/*.sql
+tests/*.pem
+tests/*.cert
+tests/*.key
+
+.DS_Store
+DOCKER_ENV
+Dockerfile-*
+output.log
+docker_tag
