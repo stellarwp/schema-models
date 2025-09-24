@@ -10,7 +10,7 @@ use StellarWP\Schema\Columns\String_Column;
 use StellarWP\Schema\Columns\Text_Column;
 use StellarWP\Schema\Columns\Float_Column;
 use StellarWP\Schema\Columns\Integer_Column;
-use StellarWP\Schema\Columns\DateTime_Column;
+use StellarWP\Schema\Columns\Datetime_Column;
 use StellarWP\Schema\Columns\PHP_Types;
 
 class MockRelationshipModelTable extends Table {
@@ -31,7 +31,7 @@ class MockRelationshipModelTable extends Table {
 		$columns[] = ( new Text_Column( 'emails' ) )->set_php_type( PHP_Types::JSON );
 		$columns[] = ( new Float_Column( 'microseconds' ) )->set_length( 17 )->set_precision( 6 );
 		$columns[] = ( new Integer_Column( 'int' ) );
-		$columns[] = ( new DateTime_Column( 'date' ) );
+		$columns[] = ( new Datetime_Column( 'date' ) );
 
 		$table_name = static::table_name( true );
 
