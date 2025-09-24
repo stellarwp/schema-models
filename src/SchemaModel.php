@@ -49,6 +49,13 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 		$this->propertyCollection = ModelPropertyCollection::fromPropertyDefinitions( $this->getPropertyDefinitionsFromSchema(), $attributes );
 	}
 
+	/**
+	 * Gets the table interface of the model.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return Table_Interface
+	 */
 	abstract public function getTableInterface(): Table_Interface;
 
 	/**
@@ -256,6 +263,8 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	 *
 	 * @param string $key Relationship name.
 	 * @param mixed  $value Relationship value.
+	 *
+	 * @throws InvalidArgumentException If the relationship is not an integer.
 	 */
 	protected function setRelationship( string $key, $value ): void {
 		$old_value                                 = $this->relationshipData[ $key ]['current'] ?? null;
@@ -296,6 +305,8 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	 * @param string $key Relationship name.
 	 *
 	 * @return Model|Model[]
+	 *
+	 * @throws InvalidArgumentException If the relationship does not exist.
 	 */
 	protected function getRelationship( string $key ) {
 		$relationships = $this->getRelationships();
@@ -315,20 +326,23 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 			case Relationship::BELONGS_TO:
 			case Relationship::HAS_ONE:
 				if ( 'post' === $relationship['entity'] ) {
-					return $this->relationshipData[ $key ]['current'] = get_post( $this->getAttribute( $key ) );
+					$this->relationshipData[ $key ]['current'] = get_post( $this->getAttribute( $key ) );
+					return $this->relationshipData[ $key ]['current'];
 				}
 
 				throw new InvalidArgumentException( "Relationship {$key} is not a post relationship." );
 			case Relationship::HAS_MANY:
 			case Relationship::BELONGS_TO_MANY:
 			case Relationship::MANY_TO_MANY:
-				return $this->relationshipData[ $key ]['current'] = wp_list_pluck(
+				$this->relationshipData[ $key ]['current'] = wp_list_pluck(
 					$relationship['through']::get_all_by(
 						$relationship['columns']['this'],
 						$this->getPrimaryValue()
 					),
 					$relationship['columns']['other']
 				);
+
+				return $this->relationshipData[ $key ]['current'];
 		}
 
 		return null;
@@ -395,7 +409,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 		$result          = $table_interface::upsert( $this->toArray() );
 
 		if ( ! $result ) {
-			throw new RuntimeException( __( 'Failed to save the model.', 'tribe-common' ) );
+			throw new RuntimeException( __( 'Failed to save the model.', 'stellarwp-schema-models' ) );
 		}
 
 		$id = $this->getPrimaryValue();
@@ -425,7 +439,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 		$uid = $this->getPrimaryValue();
 
 		if ( ! $uid ) {
-			throw new RuntimeException( __( 'Model ID is required to delete the model.', 'tribe-common' ) );
+			throw new RuntimeException( __( 'Model ID is required to delete the model.', 'stellarwp-schema-models' ) );
 		}
 
 		$this->deleteAllRelationshipData();
@@ -493,9 +507,14 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	/**
 	 * Constructs a model instance from database query data.
 	 *
-	 * @param object|array $queryData
+	 * @param object|array $data The data to construct the model from.
 	 * @param int          $mode The level of strictness to take when constructing the object, by default it will ignore extra keys but error on missing keys.
+	 *
 	 * @return static
+	 *
+	 * @throws InvalidArgumentException If the data is not an object or array.
+	 * @throws InvalidArgumentException If the property does not exist.
+	 * @throws InvalidArgumentException If the relationship does not exist.
 	 */
 	public static function fromData( $data, $mode = self::BUILD_MODE_IGNORE_EXTRA ) {
 		if ( ! is_object( $data ) && ! is_array( $data ) ) {
