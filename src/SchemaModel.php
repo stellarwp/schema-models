@@ -20,6 +20,7 @@ use RuntimeException;
 use StellarWP\Models\Model;
 use StellarWP\Models\ModelPropertyCollection;
 use StellarWP\Models\ModelPropertyDefinition;
+use WP_Post;
 
 /**
  * The schema model.
@@ -39,15 +40,37 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	private array $relationshipData = [];
 
 	/**
+	 * The model relationships assigned to their relationship types.
+	 *
+	 * @var array<string,array<string,string>>
+	 */
+	protected static array $relationships = []; // @phpstan-ignore-line
+
+	/**
+	 * The model properties assigned to their types.
+	 *
+	 * @var array<string,ModelPropertyDefinition>
+	 */
+	protected static array $properties = []; // @phpstan-ignore-line
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 0.0.1
 	 *
 	 * @param array<string,mixed> $attributes Attributes.
 	 */
-	public function __construct( array $attributes = [] ) {
+	final public function __construct( array $attributes = [] ) {
 		$this->propertyCollection = ModelPropertyCollection::fromPropertyDefinitions( $this->getPropertyDefinitionsFromSchema(), $attributes );
+		$this->constructRelationships();
 	}
+
+	/**
+	 * Constructs the relationships of the model.
+	 *
+	 * @return void
+	 */
+	protected function constructRelationships(): void {}
 
 	/**
 	 * Gets the table interface of the model.
@@ -57,6 +80,17 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	 * @return Table_Interface
 	 */
 	abstract public function getTableInterface(): Table_Interface;
+
+	/**
+	 * Gets the table class of the model.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return string
+	 */
+	protected function getTableClass(): string {
+		return get_class( $this->getTableInterface() );
+	}
 
 	/**
 	 * Gets the primary value of the model.
@@ -77,7 +111,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	 * @return string
 	 */
 	public function getPrimaryColumn(): string {
-		return $this->getTableInterface()::uid_column();
+		return $this->getTableClass()::uid_column();
 	}
 
 	/**
@@ -244,8 +278,8 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 				$definition->default( $column->get_default() );
 			}
 
-			if ( is_callable( [ $this->getTableInterface(), 'cast_value_based_on_type' ] ) ) {
-				$definition->castWith( fn( $value ) => $this->getTableInterface()::cast_value_based_on_type( $column->get_php_type(), $value ) );
+			if ( is_callable( [ $this->getTableClass(), 'cast_value_based_on_type' ] ) ) {
+				$definition->castWith( fn( $value ) => $this->getTableClass()::cast_value_based_on_type( $column->get_php_type(), $value ) );
 			}
 
 			$property_definitions[ $column->get_name() ] = $definition;
@@ -304,7 +338,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	 *
 	 * @param string $key Relationship name.
 	 *
-	 * @return Model|Model[]
+	 * @return null|WP_Post|Model|Model[]
 	 *
 	 * @throws InvalidArgumentException If the relationship does not exist.
 	 */
@@ -383,8 +417,8 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 			if ( ! empty( $this->relationshipData[ $key ]['delete'] ) ) {
 				$relationship['through']::delete_many(
 					$this->relationshipData[ $key ]['delete'],
-					$this->get_relationships()[ $key ]['columns']['other'],
-					DB::prepare( ' AND %i = %d', $this->get_relationships()[ $key ]['columns']['this'], $this->getPrimaryValue() )
+					$this->getRelationships()[ $key ]['columns']['other'],
+					DB::prepare( ' AND %i = %d', $this->getRelationships()[ $key ]['columns']['this'], $this->getPrimaryValue() )
 				);
 			}
 		}
@@ -405,8 +439,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 			return $this->getPrimaryValue();
 		}
 
-		$table_interface = $this->getTableInterface();
-		$result          = $table_interface::upsert( $this->toArray() );
+		$result = $this->getTableClass()::upsert( $this->toArray() );
 
 		if ( ! $result ) {
 			throw new RuntimeException( __( 'Failed to save the model.', 'stellarwp-schema-models' ) );
@@ -444,7 +477,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 
 		$this->deleteAllRelationshipData();
 
-		return $this->getTableInterface()::delete( $uid );
+		return $this->getTableClass()::delete( $uid );
 	}
 
 	/**
@@ -512,6 +545,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	 *
 	 * @return static
 	 *
+	 * @throws InvalidArgumentException If the abstract is used directly.
 	 * @throws InvalidArgumentException If the data is not an object or array.
 	 * @throws InvalidArgumentException If the property does not exist.
 	 * @throws InvalidArgumentException If the relationship does not exist.
@@ -523,6 +557,11 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 
 		$data = (array) $data;
 
+		if ( self::class === static::class ) {
+			throw new InvalidArgumentException( 'SchemaModel cannot be instantiated directly.' );
+		}
+
+		// @phpstan-ignore-next-line
 		$model = new static();
 
 		foreach ( static::propertyKeys() as $key ) {
