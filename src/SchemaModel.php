@@ -21,6 +21,8 @@ use StellarWP\Models\Model;
 use StellarWP\Models\ModelPropertyCollection;
 use StellarWP\Models\ModelPropertyDefinition;
 use WP_Post;
+use StellarWP\Schema\Columns\Contracts\Column;
+use DateTime;
 
 /**
  * The schema model.
@@ -260,6 +262,8 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	 * @since 0.0.1
 	 *
 	 * @return array<string,ModelPropertyDefinition>
+	 *
+	 * @throws RuntimeException On unknown reserved keyword.
 	 */
 	private function getPropertyDefinitionsFromSchema(): array {
 		$table_interface = $this->getTableInterface();
@@ -275,7 +279,23 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 			}
 
 			if ( $column->get_default() ) {
-				$definition->default( $column->get_default() );
+				$default = $column->get_default();
+				if ( in_array( $default, Column::SQL_RESERVED_DEFAULTS, true ) ) {
+					switch ( $default ) {
+						case 'CURRENT_TIMESTAMP':
+						case 'CURRENT_DATE':
+						case 'CURRENT_TIME':
+							$default = new DateTime();
+							break;
+						case 'NULL':
+							$default = null;
+							break;
+						default:
+							throw new RuntimeException( 'Unknown default RESERVED Keyword: ' . $default );
+					}
+				}
+
+				$definition->default( $default );
 			}
 
 			if ( is_callable( [ $this->getTableClass(), 'cast_value_based_on_type' ] ) ) {
