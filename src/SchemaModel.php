@@ -61,6 +61,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	 * @since 0.0.1
 	 */
 	protected function afterConstruct(): void {
+		self::purgePropertyDefinitionCache();
 		$this->propertyCollection = ModelPropertyCollection::fromPropertyDefinitions( $this->getPropertyDefinitionsFromSchema() );
 		$this->constructRelationships();
 	}
@@ -579,7 +580,6 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 			throw new InvalidArgumentException( 'SchemaModel cannot be instantiated directly.' );
 		}
 
-		// @phpstan-ignore-next-line
 		$model = new static();
 
 		foreach ( static::propertyKeys() as $key ) {
@@ -596,7 +596,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 			$model->setAttribute( $key, static::castValueForProperty( static::getPropertyDefinition( $key ), $data[ $key ], $key ) );
 		}
 
-		foreach ( $model->getRelationships() as $key => $relationship ) {
+		foreach ( array_keys( $model->getRelationships() ) as $key ) {
 			if ( ! isset( $data[ $key ] ) ) {
 				continue;
 			}
