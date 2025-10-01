@@ -272,7 +272,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 		/** @var Table_Schema_Interface $table_schema */
 		$table_schema = $table_interface::get_current_schema();
 
-		/** @var array<string,ModelPropertyDefinition> $processedDefinitions */
+		/** @var array<string,ModelPropertyDefinition> $property_definitions */
 		$property_definitions = [];
 
 		foreach ( $table_schema->get_columns() as $column ) {
@@ -593,6 +593,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 			throw new InvalidArgumentException( 'SchemaModel cannot be instantiated directly.' );
 		}
 
+		// @phpstan-ignore-next-line It is safe to instantiate the model like that since the constructor is final.
 		$model = new static();
 
 		foreach ( static::propertyKeys() as $key ) {
