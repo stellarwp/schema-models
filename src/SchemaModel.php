@@ -18,7 +18,6 @@ use StellarWP\Schema\Tables\Contracts\Table_Interface;
 use StellarWP\Schema\Tables\Contracts\Table_Schema_Interface;
 use RuntimeException;
 use StellarWP\Models\Model;
-use StellarWP\Models\ModelPropertyCollection;
 use StellarWP\Models\ModelPropertyDefinition;
 use WP_Post;
 use StellarWP\Schema\Columns\Contracts\Column;
