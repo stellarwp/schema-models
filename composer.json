@@ -34,8 +34,8 @@
   "minimum-stability": "stable",
   "require": {
     "php": ">=7.4",
-    "stellarwp/models": "dev-add-phpstan",
-    "stellarwp/schema": "^3.1"
+    "stellarwp/models": "dev-release/2.0.0",
+    "stellarwp/schema": "dev-feat/adding-the-order-by-param-in-get-all-by"
   },
   "require-dev": {
     "stellarwp/coding-standards": "^2.1",
