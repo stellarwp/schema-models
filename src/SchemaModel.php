@@ -266,6 +266,8 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	 * @since 0.0.1
 	 *
 	 * @return array<string,ModelPropertyDefinition>
+	 *
+	 * @throws RuntimeException On unknown reserved keyword.
 	 */
 	protected static function generatePropertyDefinitions(): array {
 		$table_interface = static::getTableInterface();
