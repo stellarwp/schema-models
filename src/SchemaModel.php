@@ -150,9 +150,8 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 		}
 
 		$args = $arguments['0'] ?? null;
-		$args = (array) $args;
 		if ( isset( $relationships[ $property ] ) ) {
-			$args ? $this->setRelationship( $property, $args ) : $this->deleteRelationshipData( $property );
+			$args ? $this->setRelationship( $property, (array) $args ) : $this->deleteRelationshipData( $property );
 			return;
 		}
 
