@@ -35,7 +35,7 @@
   "require": {
     "php": ">=7.4",
     "stellarwp/models": "dev-feature/definition-cache-control",
-    "stellarwp/schema": "^3.1.1"
+    "stellarwp/schema": "dev-fix/error-on-update-evaluation"
   },
   "require-dev": {
     "stellarwp/coding-standards": "^2.1",
