@@ -56,14 +56,14 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	protected static array $properties = []; // @phpstan-ignore-line
 
 	/**
-	 * Constructor.
+	 * Acts as the constructor.
 	 *
 	 * @since 0.0.1
 	 *
 	 * @param array<string,mixed> $attributes Attributes.
 	 */
-	final public function __construct( array $attributes = [] ) {
-		$this->propertyCollection = ModelPropertyCollection::fromPropertyDefinitions( $this->getPropertyDefinitionsFromSchema(), $attributes );
+	protected function afterConstruct() {
+		$this->propertyCollection = ModelPropertyCollection::fromPropertyDefinitions( $this->getPropertyDefinitionsFromSchema() );
 		$this->constructRelationships();
 	}
 
