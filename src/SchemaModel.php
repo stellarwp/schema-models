@@ -59,10 +59,8 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	 * Acts as the constructor.
 	 *
 	 * @since 0.0.1
-	 *
-	 * @param array<string,mixed> $attributes Attributes.
 	 */
-	protected function afterConstruct() {
+	protected function afterConstruct(): void {
 		$this->propertyCollection = ModelPropertyCollection::fromPropertyDefinitions( $this->getPropertyDefinitionsFromSchema() );
 		$this->constructRelationships();
 	}
