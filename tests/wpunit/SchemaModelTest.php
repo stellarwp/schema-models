@@ -59,7 +59,7 @@ class SchemaModelTest extends WPTestCase {
 			$models[] = $model;
 		}
 
-		$table = $models[0]->getTableInterface();
+		$table = $models[0]::getTableInterface();
 
 		$results = iterator_to_array($table::get_all());
 
@@ -93,9 +93,9 @@ class SchemaModelTest extends WPTestCase {
 
 		$model = MockModelSchema::fromData( $model_data, 1 );
 		$model->save();
-		$this->assertInstanceOf( MockModelSchema::class, $model->getTableInterface()::get_by_id( $model->get_id() ) );
+		$this->assertInstanceOf( MockModelSchema::class, $model::getTableInterface()::get_by_id( $model->get_id() ) );
 		$this->assertGreaterThan( 0, $model->get_id() );
 		$this->assertTrue( $model->delete() );
-		$this->assertNull( $model->getTableInterface()::get_by_id( $model->get_id() ) );
+		$this->assertNull( $model::getTableInterface()::get_by_id( $model->get_id() ) );
 	}
 }

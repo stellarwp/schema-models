@@ -23,6 +23,7 @@ use StellarWP\Models\ModelPropertyDefinition;
 use WP_Post;
 use StellarWP\Schema\Columns\Contracts\Column;
 use DateTime;
+use DateTimeInterface;
 
 /**
  * The schema model.
@@ -61,8 +62,6 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	 * @since 0.0.1
 	 */
 	protected function afterConstruct(): void {
-		self::purgePropertyDefinitionCache();
-		$this->propertyCollection = ModelPropertyCollection::fromPropertyDefinitions( $this->getPropertyDefinitionsFromSchema() );
 		$this->constructRelationships();
 	}
 
@@ -80,7 +79,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	 *
 	 * @return Table_Interface
 	 */
-	abstract public function getTableInterface(): Table_Interface;
+	abstract public static function getTableInterface(): Table_Interface;
 
 	/**
 	 * Gets the table class of the model.
@@ -89,8 +88,8 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	 *
 	 * @return string
 	 */
-	protected function getTableClass(): string {
-		return get_class( $this->getTableInterface() );
+	protected static function getTableClass(): string {
+		return get_class( static::getTableInterface() );
 	}
 
 	/**
@@ -256,23 +255,38 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	}
 
 	/**
-	 * Get the property definitions from the schema.
+	 * Generates the property definitions for the model.
+	 *
+	 * This method processes the raw property definitions from static::$properties and static::properties(),
+	 * converting shorthand notation to ModelPropertyDefinition instances and locking them.
+	 *
+	 * Child classes can override this method to customize how property definitions are generated,
+	 * either by completely replacing the logic or by calling parent::generatePropertyDefinitions()
+	 * and modifying the results.
 	 *
 	 * @since 0.0.1
 	 *
 	 * @return array<string,ModelPropertyDefinition>
-	 *
-	 * @throws RuntimeException On unknown reserved keyword.
 	 */
-	private function getPropertyDefinitionsFromSchema(): array {
-		$table_interface = $this->getTableInterface();
+	protected static function generatePropertyDefinitions(): array {
+		$table_interface = static::getTableInterface();
 		/** @var Table_Schema_Interface $table_schema */
 		$table_schema = $table_interface::get_current_schema();
 
+		/** @var array<string,ModelPropertyDefinition> $processedDefinitions */
 		$property_definitions = [];
 
 		foreach ( $table_schema->get_columns() as $column ) {
-			$definition = ( new ModelPropertyDefinition() )->type( $column->get_php_type() );
+			$definition_type = [ $column->get_php_type() ];
+			if ( 'json' === $column->get_php_type() ) {
+				$definition_type[] = 'array';
+			}
+
+			if ( DateTimeInterface::class === $column->get_php_type() ) {
+				$definition_type[] = 'object';
+			}
+
+			$definition = ( new ModelPropertyDefinition() )->type( ...$definition_type );
 			if ( $column->get_nullable() ) {
 				$definition->nullable();
 			}
@@ -297,8 +311,8 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 				$definition->default( $default );
 			}
 
-			if ( is_callable( [ $this->getTableClass(), 'cast_value_based_on_type' ] ) ) {
-				$definition->castWith( fn( $value ) => $this->getTableClass()::cast_value_based_on_type( $column->get_php_type(), $value ) );
+			if ( is_callable( [ static::getTableClass(), 'cast_value_based_on_type' ] ) ) {
+				$definition->castWith( fn( $value ) => static::getTableClass()::cast_value_based_on_type( $column->get_php_type(), $value ) );
 			}
 
 			$property_definitions[ $column->get_name() ] = $definition;

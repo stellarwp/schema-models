@@ -74,7 +74,7 @@ class SchemaModelRelationshipsTest extends WPTestCase {
 			$models[] = $model;
 		}
 
-		$table = $models[0]->getTableInterface();
+		$table = $models[0]::getTableInterface();
 
 		$results = iterator_to_array($table::get_all());
 
@@ -126,10 +126,10 @@ class SchemaModelRelationshipsTest extends WPTestCase {
 
 		$this->assertEquals( $model_data['posts'], $results );
 
-		$this->assertInstanceOf( MockModelSchemaWithRelationship::class, $model->getTableInterface()::get_by_id( $model->get_id() ) );
+		$this->assertInstanceOf( MockModelSchemaWithRelationship::class, $model::getTableInterface()::get_by_id( $model->get_id() ) );
 		$this->assertGreaterThan( 0, $model->get_id() );
 		$this->assertTrue( $model->delete() );
-		$this->assertNull( $model->getTableInterface()::get_by_id( $model->get_id() ) );
+		$this->assertNull( $model::getTableInterface()::get_by_id( $model->get_id() ) );
 
 		$results = DB::get_col( DB::prepare( "SELECT %i FROM %i WHERE %i = %d", 'post_id', MockRelationshipTable::table_name(), 'mock_model_id', $model->get_id() ) );
 		$this->assertEmpty( $results );

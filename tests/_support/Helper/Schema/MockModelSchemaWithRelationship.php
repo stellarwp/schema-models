@@ -12,7 +12,7 @@ class MockModelSchemaWithRelationship extends SchemaModel {
 		$this->defineRelationshipColumns( 'posts', 'mock_model_id', 'post_id' );
 	}
 
-	public function getTableInterface(): Table_Interface {
+	public static function getTableInterface(): Table_Interface {
 		return new MockRelationshipModelTable();
 	}
 }

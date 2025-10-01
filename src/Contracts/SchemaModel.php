@@ -40,7 +40,7 @@ interface SchemaModel extends Model {
 	 *
 	 * @return Table_Interface
 	 */
-	public function getTableInterface(): Table_Interface;
+	public static function getTableInterface(): Table_Interface;
 
 	/**
 	 * Magic method to get the relationships of the model.
