@@ -10,7 +10,7 @@
 namespace StellarWP\SchemaModels;
 
 use InvalidArgumentException;
-use BadMethodCallException;
+use StellarWP\SchemaModels\Exceptions\BadMethodCallSchemaModelException;
 use StellarWP\SchemaModels\Contracts\SchemaModel as SchemaModelInterface;
 use StellarWP\Models\ValueObjects\Relationship;
 use StellarWP\DB\DB;
@@ -127,20 +127,20 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	 *
 	 * @return array|void The relationships of the model.
 	 *
-	 * @throws BadMethodCallException If the method does not exist on the model.
-	 * @throws BadMethodCallException If the relationship does not exist on the model.
-	 * @throws BadMethodCallException If the relationship is not a many to many relationship.
+	 * @throws BadMethodCallSchemaModelException If the method does not exist on the model.
+	 * @throws BadMethodCallSchemaModelException If the relationship does not exist on the model.
+	 * @throws BadMethodCallSchemaModelException If the relationship is not a many to many relationship.
 	 */
 	public function __call( string $name, array $arguments ) {
 		if ( ! str_starts_with( $name, 'get_' ) && ! str_starts_with( $name, 'set_' ) ) {
-			throw new BadMethodCallException( "Method {$name} does not exist on the model." );
+			throw new BadMethodCallSchemaModelException( "Method {$name} does not exist on the model." );
 		}
 
 		$property      = str_replace( [ 'get_', 'set_' ], '', $name );
 		$relationships = $this->getRelationships();
 
 		if ( ! $this->hasProperty( $property ) && ! isset( $relationships[ $property ] ) ) {
-			throw new BadMethodCallException( "`{$property}` is not a property or a relationship on the model." );
+			throw new BadMethodCallSchemaModelException( "`{$property}` is not a property or a relationship on the model." );
 		}
 
 		$is_getter = str_starts_with( $name, 'get_' );
