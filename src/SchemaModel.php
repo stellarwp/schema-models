@@ -85,7 +85,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @return string
+	 * @return class-string<Table_Interface>
 	 */
 	protected static function getTableClass(): string {
 		return get_class( static::getTableInterface() );
