@@ -539,6 +539,8 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	 *
 	 * @since 0.1.0
 	 *
+	 * phpcs:disable Squiz.Commenting.FunctionComment.IncorrectTypeHint
+	 *
 	 * @param string                         $key                 The key of the relationship.
 	 * @param string                         $type                The type of the relationship.
 	 * @param ?class-string<Table_Interface> $through             A table interface that provides the relationship.
@@ -551,6 +553,8 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 			'entity'  => $relationship_entity,
 		];
 	}
+
+	// phpcs:enable Squiz.Commenting.FunctionComment.IncorrectTypeHint
 
 	/**
 	 * Sets the relationship columns for the model.
