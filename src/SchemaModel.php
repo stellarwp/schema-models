@@ -535,10 +535,10 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param string  $key                 The key of the relationship.
-	 * @param string  $type                The type of the relationship.
+	 * @param string                         $key                 The key of the relationship.
+	 * @param string                         $type                The type of the relationship.
 	 * @param ?class-string<Table_Interface> $through             A table interface that provides the relationship.
-	 * @param string  $relationship_entity The entity of the relationship.
+	 * @param string                         $relationship_entity The entity of the relationship.
 	 */
 	protected function defineRelationship( string $key, string $type, ?string $through = null, string $relationship_entity = 'post' ): void {
 		static::$relationships[ $key ] = [
