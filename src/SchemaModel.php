@@ -2,7 +2,7 @@
 /**
  * The schema model.
  *
- * @since 0.0.1
+ * @since 0.1.0
  *
  * @package StellarWP\SchemaModels;
  */
@@ -27,7 +27,7 @@ use DateTimeInterface;
 /**
  * The schema model.
  *
- * @since 0.0.1
+ * @since 0.1.0
  *
  * @package StellarWP\SchemaModels;
  */
@@ -35,7 +35,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	/**
 	 * The relationship data of the model.
 	 *
-	 * @since 0.0.1
+	 * @since 0.1.0
 	 *
 	 * @var array
 	 */
@@ -58,7 +58,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	/**
 	 * Acts as the constructor.
 	 *
-	 * @since 0.0.1
+	 * @since 0.1.0
 	 */
 	protected function afterConstruct(): void {
 		$this->constructRelationships();
@@ -74,7 +74,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	/**
 	 * Gets the table interface of the model.
 	 *
-	 * @since 0.0.1
+	 * @since 0.1.0
 	 *
 	 * @return Table_Interface
 	 */
@@ -83,7 +83,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	/**
 	 * Gets the table class of the model.
 	 *
-	 * @since 0.0.1
+	 * @since 0.1.0
 	 *
 	 * @return string
 	 */
@@ -94,7 +94,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	/**
 	 * Gets the primary value of the model.
 	 *
-	 * @since 0.0.1
+	 * @since 0.1.0
 	 *
 	 * @return mixed
 	 */
@@ -105,7 +105,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	/**
 	 * Gets the primary column of the model.
 	 *
-	 * @since 0.0.1
+	 * @since 0.1.0
 	 *
 	 * @return string
 	 */
@@ -116,7 +116,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	/**
 	 * Magic method to get the relationships of the model.
 	 *
-	 * @since 0.0.1
+	 * @since 0.1.0
 	 *
 	 * @param string $name The name of the method.
 	 * @param array  $arguments The arguments of the method.
@@ -161,7 +161,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	/**
 	 * Gets the relationships of the model.
 	 *
-	 * @since 0.0.1
+	 * @since 0.1.0
 	 *
 	 * @return array The relationships of the model.
 	 */
@@ -172,7 +172,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	/**
 	 * Deletes the relationship data for a given key.
 	 *
-	 * @since 0.0.1
+	 * @since 0.1.0
 	 *
 	 * @param string $key The key of the relationship.
 	 *
@@ -191,7 +191,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	/**
 	 * Adds an ID to a relationship.
 	 *
-	 * @since 0.0.1
+	 * @since 0.1.0
 	 *
 	 * @param string $key The key of the relationship.
 	 * @param int    $id  The ID to add.
@@ -223,7 +223,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	/**
 	 * Removes an ID from a relationship.
 	 *
-	 * @since 0.0.1
+	 * @since 0.1.0
 	 *
 	 * @param string $key The key of the relationship.
 	 * @param int    $id  The ID to remove.
@@ -262,7 +262,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	 * either by completely replacing the logic or by calling parent::generatePropertyDefinitions()
 	 * and modifying the results.
 	 *
-	 * @since 0.0.1
+	 * @since 0.1.0
 	 *
 	 * @return array<string,ModelPropertyDefinition>
 	 *
@@ -367,7 +367,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	/**
 	 * Returns a relationship.
 	 *
-	 * @since 0.0.1
+	 * @since 0.1.0
 	 *
 	 * @param string $key Relationship name.
 	 *
@@ -418,7 +418,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	/**
 	 * Saves the relationship data.
 	 *
-	 * @since 0.0.1
+	 * @since 0.1.0
 	 *
 	 * @return void
 	 */
@@ -460,7 +460,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	/**
 	 * Saves the model.
 	 *
-	 * @since 0.0.1
+	 * @since 0.1.0
 	 *
 	 * @return int The id of the saved model.
 	 *
@@ -516,7 +516,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	/**
 	 * Deletes all the relationship data.
 	 *
-	 * @since 0.0.1
+	 * @since 0.1.0
 	 *
 	 * @return void
 	 */
@@ -533,7 +533,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	/**
 	 * Sets a relationship for the model.
 	 *
-	 * @since 0.0.1
+	 * @since 0.1.0
 	 *
 	 * @param string  $key                 The key of the relationship.
 	 * @param string  $type                The type of the relationship.
@@ -551,7 +551,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	/**
 	 * Sets the relationship columns for the model.
 	 *
-	 * @since 0.0.1
+	 * @since 0.1.0
 	 *
 	 * @param string $key                 The key of the relationship.
 	 * @param string $this_entity_column  The column of the relationship.

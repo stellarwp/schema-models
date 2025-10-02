@@ -2,7 +2,7 @@
 /**
  * The schema model contract.
  *
- * @since 0.0.1
+ * @since 0.1.0
  *
  * @package StellarWP\SchemaModels\Contracts;
  */
@@ -18,7 +18,7 @@ interface SchemaModel extends Model {
 	/**
 	 * Gets the primary value of the model.
 	 *
-	 * @since 0.0.1
+	 * @since 0.1.0
 	 *
 	 * @return mixed
 	 */
@@ -27,7 +27,7 @@ interface SchemaModel extends Model {
 	/**
 	 * Gets the primary column of the model.
 	 *
-	 * @since 0.0.1
+	 * @since 0.1.0
 	 *
 	 * @return string
 	 */
@@ -36,7 +36,7 @@ interface SchemaModel extends Model {
 	/**
 	 * Gets the table interface of the model.
 	 *
-	 * @since 0.0.1
+	 * @since 0.1.0
 	 *
 	 * @return Table_Interface
 	 */
@@ -45,7 +45,7 @@ interface SchemaModel extends Model {
 	/**
 	 * Gets the relationships of the model.
 	 *
-	 * @since 0.0.1
+	 * @since 0.1.0
 	 *
 	 * @return array The relationships of the model.
 	 */
@@ -54,7 +54,7 @@ interface SchemaModel extends Model {
 	/**
 	 * Deletes the relationship data for a given key.
 	 *
-	 * @since 0.0.1
+	 * @since 0.1.0
 	 *
 	 * @param string $key The key of the relationship.
 	 */
@@ -63,7 +63,7 @@ interface SchemaModel extends Model {
 	/**
 	 * Adds an ID to a relationship.
 	 *
-	 * @since 0.0.1
+	 * @since 0.1.0
 	 *
 	 * @param string $key The key of the relationship.
 	 * @param int    $id  The ID to add.
@@ -73,7 +73,7 @@ interface SchemaModel extends Model {
 	/**
 	 * Removes an ID from a relationship.
 	 *
-	 * @since 0.0.1
+	 * @since 0.1.0
 	 *
 	 * @param string $key The key of the relationship.
 	 * @param int    $id  The ID to remove.
@@ -83,7 +83,7 @@ interface SchemaModel extends Model {
 	/**
 	 * Saves the model.
 	 *
-	 * @since 0.0.1
+	 * @since 0.1.0
 	 *
 	 * @return int The ID of the saved model.
 	 */
@@ -92,7 +92,7 @@ interface SchemaModel extends Model {
 	/**
 	 * Deletes the model.
 	 *
-	 * @since 0.0.1
+	 * @since 0.1.0
 	 *
 	 * @return bool Whether the model was deleted.
 	 */
