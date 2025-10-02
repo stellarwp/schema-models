@@ -43,18 +43,6 @@ interface SchemaModel extends Model {
 	public static function getTableInterface(): Table_Interface;
 
 	/**
-	 * Magic method to get the relationships of the model.
-	 *
-	 * @since 0.0.1
-	 *
-	 * @param string $name The name of the method.
-	 * @param array  $arguments The arguments of the method.
-	 *
-	 * @return array|void The relationships of the model.
-	 */
-	public function __call( string $name, array $arguments );
-
-	/**
 	 * Gets the relationships of the model.
 	 *
 	 * @since 0.0.1
