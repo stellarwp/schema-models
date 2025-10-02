@@ -3,7 +3,7 @@
 namespace StellarWP\SchemaModels\Tests\Schema;
 
 use StellarWP\SchemaModels\SchemaModel;
-use StellarWP\Schema\Tables\Contracts\Table_Interface;
+use StellarWP\Schema\Tables\Contracts\Table as Table_Interface;
 use StellarWP\Models\ValueObjects\Relationship;
 
 class MockModelSchemaWithRelationship extends SchemaModel {
