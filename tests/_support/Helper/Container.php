@@ -2,7 +2,7 @@
 /**
  * Schema Models's container for tests.
  *
- * @since TBD
+ * @since 0.1.0
  *
  * @package StellarWP\SchemaModels\Tests
  */
@@ -18,7 +18,7 @@ use lucatume\DI52\Container as DI52_Container;
 /**
  * Schema Models's container for tests.
  *
- * @since TBD
+ * @since 0.1.0
  *
  * @package StellarWP\SchemaModels\Tests
  */

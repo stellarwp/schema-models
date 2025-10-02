@@ -326,7 +326,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	/**
 	 * Sets a relationship.
 	 *
-	 * @since 2.0.0
+	 * @since 0.1.0
 	 *
 	 * @param string $key Relationship name.
 	 * @param mixed  $value Relationship value.
@@ -495,7 +495,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	/**
 	 * Deletes the model.
 	 *
-	 * @since TBD
+	 * @since 0.1.0
 	 *
 	 * @return bool Whether the model was deleted.
 	 *
@@ -535,10 +535,10 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param string  $key                 The key of the relationship.
-	 * @param string  $type                The type of the relationship.
+	 * @param string                         $key                 The key of the relationship.
+	 * @param string                         $type                The type of the relationship.
 	 * @param ?class-string<Table_Interface> $through             A table interface that provides the relationship.
-	 * @param string  $relationship_entity The entity of the relationship.
+	 * @param string                         $relationship_entity The entity of the relationship.
 	 */
 	protected function defineRelationship( string $key, string $type, ?string $through = null, string $relationship_entity = 'post' ): void {
 		static::$relationships[ $key ] = [
@@ -607,7 +607,6 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 				continue;
 			}
 
-			// Remember not to use $type, as it may be an array that includes the default value. Safer to use getPropertyType().
 			$model->setAttribute( $key, static::castValueForProperty( static::getPropertyDefinition( $key ), $data[ $key ], $key ) );
 		}
 
