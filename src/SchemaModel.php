@@ -46,7 +46,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @var array<string,array<string,string>>
+	 * @var array<string,array{ type: string, through: string, entity: string, columns: array{ this: string, other: string } }>
 	 */
 	protected static array $relationships = []; // @phpstan-ignore-line
 
@@ -167,7 +167,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @return array<string,array<string,string>> The relationships of the model.
+	 * @return array<string,array{ type: string, through: string, entity: string, columns: array{ this: string, other: string } }> The relationships of the model.
 	 */
 	public function getRelationships(): array {
 		return static::$relationships;
