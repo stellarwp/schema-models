@@ -113,7 +113,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 			throw new BadMethodCallSchemaModelException( "Method {$name} does not exist on the model." );
 		}
 
-		$property      = str_replace( [ 'get_', 'set_' ], '', $name );
+		$property = str_replace( [ 'get_', 'set_' ], '', $name );
 
 		if ( ! $this->hasProperty( $property ) && ! $this->getRelationships()->has( $property ) ) {
 			throw new BadMethodCallSchemaModelException( "`{$property}` is not a property or a relationship on the model." );
@@ -171,7 +171,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	 */
 	protected function fetchRelationship( string $key ) {
 		$relationship = $this->getRelationships()->getOrFail( $key );
-		$definition = $relationship->getDefinition();
+		$definition   = $relationship->getDefinition();
 
 		if ( ! $definition instanceof ManyToManyWithPostsContract ) {
 			throw new InvalidArgumentException( "Relationship {$key} is not a many to many relationship. I don't know how to fetch it." );
@@ -318,7 +318,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param string $key Relationship name.
+	 * @param string                 $key Relationship name.
 	 * @param Model|list<Model>|null $value The relationship value to cache.
 	 *
 	 * @throws InvalidArgumentException If the relationship is not an integer.
@@ -374,7 +374,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 				$insert_data = [];
 				foreach ( $this->relationshipData[ $key ]['insert'] as $insert_id ) {
 					$insert_data[] = [
-						$definition->getThisEntityColumn()  => $this->getPrimaryValue(),
+						$definition->getThisEntityColumn() => $this->getPrimaryValue(),
 						$definition->getOtherEntityColumn() => $insert_id,
 					];
 				}
