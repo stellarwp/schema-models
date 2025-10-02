@@ -14,7 +14,7 @@ use BadMethodCallException;
 use StellarWP\SchemaModels\Contracts\SchemaModel as SchemaModelInterface;
 use StellarWP\Models\ValueObjects\Relationship;
 use StellarWP\DB\DB;
-use StellarWP\Schema\Tables\Contracts\Table_Interface;
+use StellarWP\Schema\Tables\Contracts\Table as Table_Interface;
 use StellarWP\Schema\Tables\Contracts\Table_Schema_Interface;
 use RuntimeException;
 use StellarWP\Models\Model;
@@ -44,12 +44,16 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	/**
 	 * The model relationships assigned to their relationship types.
 	 *
+	 * @since 0.1.0
+	 *
 	 * @var array<string,array<string,string>>
 	 */
 	protected static array $relationships = []; // @phpstan-ignore-line
 
 	/**
 	 * The model properties assigned to their types.
+	 *
+	 * @since 0.1.0
 	 *
 	 * @var array<string,ModelPropertyDefinition>
 	 */
@@ -163,7 +167,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @return array The relationships of the model.
+	 * @return array<string,array<string,string>> The relationships of the model.
 	 */
 	public function getRelationships(): array {
 		return static::$relationships;

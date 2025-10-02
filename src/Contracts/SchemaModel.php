@@ -11,7 +11,7 @@ declare( strict_types=1 );
 
 namespace StellarWP\SchemaModels\Contracts;
 
-use StellarWP\Schema\Tables\Contracts\Table_Interface;
+use StellarWP\Schema\Tables\Contracts\Table as Table_Interface;
 use StellarWP\Models\Contracts\Model;
 
 interface SchemaModel extends Model {
@@ -47,7 +47,7 @@ interface SchemaModel extends Model {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @return array The relationships of the model.
+	 * @return array<string,array<string,string>> The relationships of the model.
 	 */
 	public function getRelationships(): array;
 
