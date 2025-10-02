@@ -5,11 +5,16 @@ namespace StellarWP\SchemaModels\Tests\Schema;
 use StellarWP\SchemaModels\SchemaModel;
 use StellarWP\Schema\Tables\Contracts\Table as Table_Interface;
 use StellarWP\Models\ValueObjects\Relationship;
+use StellarWP\SchemaModels\Relationships\ManyToManyWithPosts;
 
 class MockModelSchemaWithRelationship extends SchemaModel {
-	protected function constructRelationships(): void {
-		$this->defineRelationship( 'posts', Relationship::MANY_TO_MANY, MockRelationshipTable::class );
-		$this->defineRelationshipColumns( 'posts', 'mock_model_id', 'post_id' );
+	protected static function relationships(): array {
+		return [
+			'posts' => ( new ManyToManyWithPosts( 'posts' ) )
+				->setTableInterface( MockRelationshipTable::class )
+				->setThisEntityColumn( 'mock_model_id' )
+				->setOtherEntityColumn( 'post_id' ),
+		];
 	}
 
 	public static function getTableInterface(): Table_Interface {
