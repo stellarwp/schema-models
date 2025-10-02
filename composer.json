@@ -2,7 +2,7 @@
   "name": "stellarwp/schema-models",
   "description": "A library for offloading tasks to background processes.",
   "type": "library",
-  "license": "MIT",
+  "license": "GPL-3.0-or-later",
   "config": {
     "platform": {
       "php": "7.4"
