@@ -16,6 +16,13 @@ use StellarWP\Models\Contracts\Model;
 use StellarWP\Models\Contracts\ModelPersistable;
 use StellarWP\Models\ModelRelationshipCollection;
 
+/**
+ * The schema model contract.
+ *
+ * @since 0.1.0
+ *
+ * @package StellarWP\SchemaModels\Contracts;
+ */
 interface SchemaModel extends Model, ModelPersistable {
 	/**
 	 * Gets the primary value of the model.
