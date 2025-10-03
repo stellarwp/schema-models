@@ -80,7 +80,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	/**
 	 * @since 0.1.0
 	 *
-	 * @param int|string $id
+	 * @param int|string $id The ID of the model.
 	 *
 	 * @return ?SchemaModel
 	 */
@@ -91,7 +91,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	/**
 	 * @since 0.1.0
 	 *
-	 * @param array<string,mixed> $attributes
+	 * @param array<string,mixed> $attributes The attributes of the model.
 	 *
 	 * @return SchemaModel
 	 *
@@ -201,6 +201,8 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	 * @param string $key Relationship name.
 	 *
 	 * @return Model|Model[]|LazyModelInterface|LazyModelInterface[]|null
+	 *
+	 * @throws InvalidArgumentException If the relationship is not a relationship with CRUD.
 	 */
 	protected function fetchRelationship( string $key ) {
 		$relationship = $this->getRelationshipCollection()->getOrFail( $key );

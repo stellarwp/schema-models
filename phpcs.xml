@@ -13,6 +13,8 @@
 		<exclude name="Generic.Arrays.DisallowShortArraySyntax"/>
 		<exclude name="WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase"/>
 		<exclude name="WordPress.NamingConventions.ValidVariableName.PropertyNotSnakeCase"/>
+		<exclude name="WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase"/>
+		<exclude name="WordPress.NamingConventions.ValidFunctionName.MethodNameInvalid"/>
 	</rule>
 
 	<!-- Enforce our specific plugin's text domain. -->

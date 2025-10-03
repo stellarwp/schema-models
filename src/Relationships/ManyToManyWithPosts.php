@@ -101,6 +101,8 @@ class ManyToManyWithPosts extends ModelRelationshipDefinition implements ManyToM
 	 *
 	 * @since 0.1.0
 	 *
+	 * // phpcs:disable Squiz.Commenting.FunctionComment.IncorrectTypeHint
+	 *
 	 * @param class-string<Table_Interface> $tableInterface The table interface.
 	 *
 	 * @return self
@@ -110,6 +112,8 @@ class ManyToManyWithPosts extends ModelRelationshipDefinition implements ManyToM
 
 		return $this;
 	}
+
+	// phpcs:enable Squiz.Commenting.FunctionComment.IncorrectTypeHint
 
 	/**
 	 * Gets the this entity column.
@@ -175,7 +179,7 @@ class ManyToManyWithPosts extends ModelRelationshipDefinition implements ManyToM
 					1000
 				),
 				$this->getOtherEntityColumn()
-			) 
+			)
 		);
 	}
 
@@ -216,6 +220,7 @@ class ManyToManyWithPosts extends ModelRelationshipDefinition implements ManyToM
 	 * @since 0.1.0
 	 *
 	 * @param mixed $id The ID of the relationship.
+	 * @param array $data The data to delete.
 	 */
 	public function deleteRelationshipData( $id, $data ): void {
 		$this->getTableInterface()::delete_many(

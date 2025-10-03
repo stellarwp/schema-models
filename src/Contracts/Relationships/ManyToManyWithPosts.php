@@ -48,11 +48,15 @@ interface ManyToManyWithPosts extends RelationshipWithLazyMethods, RelationshipC
 	 *
 	 * @since 0.1.0
 	 *
+	 * // phpcs:disable Squiz.Commenting.FunctionComment.IncorrectTypeHint
+	 *
 	 * @param class-string<Table_Interface> $tableInterface The table interface.
 	 *
 	 * @return self
 	 */
 	public function setTableInterface( string $tableInterface ): self;
+
+	// phpcs:enable Squiz.Commenting.FunctionComment.IncorrectTypeHint
 
 	/**
 	 * Gets the this entity column.
