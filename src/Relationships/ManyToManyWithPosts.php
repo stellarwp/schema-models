@@ -17,7 +17,6 @@ use StellarWP\SchemaModels\Contracts\Relationships\ManyToManyWithPosts as ManyTo
 use StellarWP\Models\LazyWPPostModel;
 use StellarWP\Models\Contracts\LazyModel as LazyModelInterface;
 use StellarWP\DB\DB;
-use InvalidArgumentException;
 
 /**
  * Many to many relationship with posts.
@@ -167,7 +166,7 @@ class ManyToManyWithPosts extends ModelRelationshipDefinition implements ManyToM
 		$table = $this->getTableInterface();
 
 		return array_map(
-			fn( $id ) => new LazyWPPostModel($id),
+			fn( $id ) => new LazyWPPostModel( $id ),
 			wp_list_pluck(
 				$table::get_all_by(
 					$this->getThisEntityColumn(),
@@ -175,8 +174,9 @@ class ManyToManyWithPosts extends ModelRelationshipDefinition implements ManyToM
 					'=',
 					1000
 				),
-			$this->getOtherEntityColumn()
-		) );
+				$this->getOtherEntityColumn()
+			) 
+		);
 	}
 
 	/**
