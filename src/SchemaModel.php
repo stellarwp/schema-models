@@ -27,6 +27,7 @@ use DateTime;
 use DateTimeInterface;
 use StellarWP\Models\ModelQueryBuilder;
 use StellarWP\Models\Contracts\LazyModel as LazyModelInterface;
+use StellarWP\Models\ModelRelationshipDefinition;
 
 /**
  * The schema model.
@@ -182,7 +183,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 			throw new InvalidArgumentException( "Relationship {$key} does not exist." );
 		}
 
-		/** @var ModelRelationshipDefinition $relationship */
+		/** @var ModelRelationshipDefinition $definition */
 		$definition = $this->getRelationshipCollection()->get( $key )->getDefinition();
 
 		if ( ! $definition instanceof RelationshipCRUDContract ) {
