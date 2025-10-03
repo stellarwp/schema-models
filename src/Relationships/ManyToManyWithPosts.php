@@ -14,6 +14,10 @@ namespace StellarWP\SchemaModels\Relationships;
 use StellarWP\Models\ModelRelationshipDefinition;
 use StellarWP\Schema\Tables\Contracts\Table as Table_Interface;
 use StellarWP\SchemaModels\Contracts\Relationships\ManyToManyWithPosts as ManyToManyWithPostsContract;
+use StellarWP\Models\LazyWPPostModel;
+use StellarWP\Models\Contracts\LazyModel as LazyModelInterface;
+use StellarWP\DB\DB;
+use InvalidArgumentException;
 
 /**
  * Many to many relationship with posts.
@@ -139,5 +143,108 @@ class ManyToManyWithPosts extends ModelRelationshipDefinition implements ManyToM
 	 */
 	public function getTableInterface(): string {
 		return $this->tableInterface;
+	}
+
+	/**
+	 * Deletes the relationship data.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param mixed $id The ID of the relationship.
+	 */
+	public function deleteAllRelationshipData( $id ): void {
+		$this->getTableInterface()::delete( $id, $this->getThisEntityColumn() );
+	}
+
+	/**
+	 * Fetches the relationship data.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param mixed $id The ID of the relationship.
+	 */
+	public function fetchRelationshipData( $id ) {
+		$table = $this->getTableInterface();
+
+		return array_map(
+			fn( $id ) => new LazyWPPostModel($id),
+			wp_list_pluck(
+				$table::get_all_by(
+					$this->getThisEntityColumn(),
+					$id,
+					'=',
+					1000
+				),
+			$this->getOtherEntityColumn()
+		) );
+	}
+
+	/**
+	 * Inserts the relationship data.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param mixed $id   The ID of the relationship.
+	 * @param array $data The data to insert.
+	 */
+	public function insertRelationshipData( $id, array $data = [] ): void {
+		if ( empty( $data ) ) {
+			return;
+		}
+
+		$insert_data = [];
+		foreach ( $data as $insert_id ) {
+			$insert_data[] = [
+				$this->getThisEntityColumn()  => $id,
+				$this->getOtherEntityColumn() => $insert_id,
+			];
+		}
+
+		// First delete them to avoid duplicates.
+		$this->getTableInterface()::delete_many(
+			$data,
+			$this->getOtherEntityColumn(),
+			DB::prepare( ' AND %i = %d', $this->getThisEntityColumn(), $id )
+		);
+
+		$this->getTableInterface()::insert_many( $insert_data );
+	}
+
+	/**
+	 * Deletes the relationship data.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param mixed $id The ID of the relationship.
+	 */
+	public function deleteRelationshipData( $id, $data ): void {
+		$this->getTableInterface()::delete_many(
+			$data,
+			$this->getOtherEntityColumn(),
+			DB::prepare( ' AND %i = %d', $this->getThisEntityColumn(), $id )
+		);
+	}
+
+	/**
+	 * Converts a value to a lazy model.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param mixed $value The value to convert.
+	 *
+	 * @return ?LazyModelInterface
+	 */
+	public function toLazy( $value ): ?LazyModelInterface {
+		if ( $value instanceof LazyModelInterface ) {
+			return $value;
+		}
+
+		$value = intval( $value );
+
+		if ( ! $value ) {
+			return null;
+		}
+
+		return new LazyWPPostModel( $value );
 	}
 }

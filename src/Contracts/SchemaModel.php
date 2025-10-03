@@ -13,9 +13,10 @@ namespace StellarWP\SchemaModels\Contracts;
 
 use StellarWP\Schema\Tables\Contracts\Table as Table_Interface;
 use StellarWP\Models\Contracts\Model;
+use StellarWP\Models\Contracts\ModelPersistable;
 use StellarWP\Models\ModelRelationshipCollection;
 
-interface SchemaModel extends Model {
+interface SchemaModel extends Model, ModelPersistable {
 	/**
 	 * Gets the primary value of the model.
 	 *
@@ -41,7 +42,7 @@ interface SchemaModel extends Model {
 	 *
 	 * @return ModelRelationshipCollection
 	 */
-	public function getRelationships(): ModelRelationshipCollection;
+	public function getRelationshipCollection(): ModelRelationshipCollection;
 
 	/**
 	 * Gets the table interface of the model.
@@ -80,22 +81,4 @@ interface SchemaModel extends Model {
 	 * @param mixed  $id  The ID to remove.
 	 */
 	public function removeFromRelationship( string $key, $id ): void;
-
-	/**
-	 * Saves the model.
-	 *
-	 * @since 0.1.0
-	 *
-	 * @return int The ID of the saved model.
-	 */
-	public function save(): int;
-
-	/**
-	 * Deletes the model.
-	 *
-	 * @since 0.1.0
-	 *
-	 * @return bool Whether the model was deleted.
-	 */
-	public function delete(): bool;
 }

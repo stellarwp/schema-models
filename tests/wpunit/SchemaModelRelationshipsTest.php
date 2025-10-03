@@ -6,6 +6,7 @@ use lucatume\WPBrowser\TestCase\WPTestCase;
 use DateTime;
 use StellarWP\SchemaModels\Tests\Schema\MockModelSchemaWithRelationship;
 use StellarWP\SchemaModels\Tests\Schema\MockRelationshipTable;
+use StellarWP\Models\WPPostModel;
 use StellarWP\DB\DB;
 
 class SchemaModelRelationshipsTest extends WPTestCase {
@@ -22,7 +23,7 @@ class SchemaModelRelationshipsTest extends WPTestCase {
 
 		$model = MockModelSchemaWithRelationship::fromData( $model_data, 1 );
 		$this->assertTrue( $model->isDirty() );
-		$id = $model->save();
+		$id = $model->save()->getPrimaryValue();
 		$this->assertFalse( $model->isDirty() );
 
 		$this->assertIsInt( $id );
@@ -34,7 +35,13 @@ class SchemaModelRelationshipsTest extends WPTestCase {
 		$this->assertEquals( $model_data['microseconds'], $model->get_microseconds() );
 		$this->assertEquals( $model_data['int'], $model->get_int() );
 		$this->assertEquals( $model_data['date'], $model->get_date() );
-		$this->assertEquals( $model_data['posts'], $model->get_posts() );
+
+		$postModels = $model->get_posts();
+		$this->assertCount( 2, $postModels );
+		$this->assertInstanceOf( WPPostModel::class, $postModels[0] );
+		$this->assertInstanceOf( WPPostModel::class, $postModels[1] );
+		$this->assertEquals( $post_id_1, $postModels[0]->getAttribute('ID') );
+		$this->assertEquals( $post_id_2, $postModels[1]->getAttribute('ID') );
 	}
 
 	public function test_queries_returns_models() {
@@ -103,9 +110,9 @@ class SchemaModelRelationshipsTest extends WPTestCase {
 		$this->assertEquals( $models[0]->get_date(), $results[0]->get_date() );
 		$this->assertEquals( $models[1]->get_date(), $results[1]->get_date() );
 		$this->assertEquals( $models[2]->get_date(), $results[2]->get_date() );
-		$this->assertEquals( $models[0]->get_posts(), $results[0]->get_posts() );
-		$this->assertEquals( $models[1]->get_posts(), $results[1]->get_posts() );
-		$this->assertEquals( $models[2]->get_posts(), $results[2]->get_posts() );
+		$this->assertEquals( array_map(fn($post) => $post->getAttribute('ID'), $models[0]->get_posts()), array_map(fn($post) => $post->getAttribute('ID'), $results[0]->get_posts()) );
+		$this->assertEquals( array_map(fn($post) => $post->getAttribute('ID'), $models[1]->get_posts()), array_map(fn($post) => $post->getAttribute('ID'), $results[1]->get_posts()) );
+		$this->assertEquals( array_map(fn($post) => $post->getAttribute('ID'), $models[2]->get_posts()), array_map(fn($post) => $post->getAttribute('ID'), $results[2]->get_posts()) );
 	}
 
 	public function test_delete() {

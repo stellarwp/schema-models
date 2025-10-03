@@ -17,12 +17,16 @@ use StellarWP\Schema\Tables\Contracts\Table as Table_Interface;
 use StellarWP\Schema\Tables\Contracts\Table_Schema_Interface;
 use RuntimeException;
 use StellarWP\Models\Model;
+use StellarWP\Models\Contracts\Model as ModelContract;
 use StellarWP\Models\ModelPropertyDefinition;
 use StellarWP\Models\ModelRelationshipCollection;
-use StellarWP\SchemaModels\Contracts\Relationships\ManyToManyWithPosts as ManyToManyWithPostsContract;
+use StellarWP\SchemaModels\Contracts\Relationships\RelationshipWithLazyMethods;
+use StellarWP\SchemaModels\Contracts\Relationships\RelationshipCRUD as RelationshipCRUDContract;
 use StellarWP\Schema\Columns\Contracts\Column;
 use DateTime;
 use DateTimeInterface;
+use StellarWP\Models\ModelQueryBuilder;
+use StellarWP\Models\Contracts\LazyModel as LazyModelInterface;
 
 /**
  * The schema model.
@@ -68,8 +72,34 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	 *
 	 * @return ModelRelationshipCollection
 	 */
-	public function getRelationships(): ModelRelationshipCollection {
+	public function getRelationshipCollection(): ModelRelationshipCollection {
 		return $this->relationshipCollection;
+	}
+
+	/**
+	 * @since 0.1.0
+	 *
+	 * @param int|string $id
+	 *
+	 * @return ?SchemaModel
+	 */
+	public static function find( $id ): ?SchemaModel {
+		return static::getTableClass()::get_by_id( $id );
+	}
+
+	/**
+	 * @since 0.1.0
+	 *
+	 * @param array<string,mixed> $attributes
+	 *
+	 * @return SchemaModel
+	 *
+	 * @throws RuntimeException If the model fails to save.
+	 */
+	public static function create( array $attributes ): SchemaModel {
+		$model = static::fromData( $attributes );
+
+		return $model->save();
 	}
 
 	/**
@@ -115,22 +145,22 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 
 		$property = str_replace( [ 'get_', 'set_' ], '', $name );
 
-		if ( ! $this->hasProperty( $property ) && ! $this->getRelationships()->has( $property ) ) {
+		if ( ! $this->hasProperty( $property ) && ! $this->getRelationshipCollection()->has( $property ) ) {
 			throw new BadMethodCallSchemaModelException( "`{$property}` is not a property or a relationship on the model." );
 		}
 
 		$is_getter = str_starts_with( $name, 'get_' );
 
 		if ( $is_getter ) {
-			if ( $this->getRelationships()->has( $property ) ) {
-				return $this->$property;
+			if ( $this->getRelationshipCollection()->has( $property ) ) {
+				return $this->getRelationship( $property );
 			}
 
 			return $this->getAttribute( $property );
 		}
 
 		$args = $arguments['0'] ?? null;
-		if ( $this->getRelationships()->has( $property ) ) {
+		if ( $this->getRelationshipCollection()->has( $property ) ) {
 			$args ? $this->setCachedRelationship( $property, (array) $args ) : $this->deleteRelationshipData( $property );
 			return;
 		}
@@ -148,16 +178,18 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	 * @throws InvalidArgumentException If the relationship does not exist.
 	 */
 	public function deleteRelationshipData( string $key ): void {
-		if ( ! $this->getRelationships()->has( $key ) ) {
+		if ( ! $this->getRelationshipCollection()->has( $key ) ) {
 			throw new InvalidArgumentException( "Relationship {$key} does not exist." );
 		}
 
 		/** @var ModelRelationshipDefinition $relationship */
-		$definition = $this->getRelationships()->get( $key )->getDefinition();
+		$definition = $this->getRelationshipCollection()->get( $key )->getDefinition();
 
-		if ( $definition instanceof ManyToManyWithPostsContract ) {
-			$definition->getTableInterface()::delete( $this->getPrimaryValue(), $definition->getThisEntityColumn() );
+		if ( ! $definition instanceof RelationshipCRUDContract ) {
+			throw new InvalidArgumentException( "Relationship {$key} is not a relationship with CRUD." );
 		}
+
+		$definition->deleteAllRelationshipData( $this->getPrimaryValue() );
 	}
 
 	/**
@@ -167,27 +199,17 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	 *
 	 * @param string $key Relationship name.
 	 *
-	 * @return Model|list<Model>|null
+	 * @return Model|Model[]|LazyModelInterface|LazyModelInterface[]|null
 	 */
 	protected function fetchRelationship( string $key ) {
-		$relationship = $this->getRelationships()->getOrFail( $key );
+		$relationship = $this->getRelationshipCollection()->getOrFail( $key );
 		$definition   = $relationship->getDefinition();
 
-		if ( ! $definition instanceof ManyToManyWithPostsContract ) {
-			throw new InvalidArgumentException( "Relationship {$key} is not a many to many relationship. I don't know how to fetch it." );
+		if ( ! $definition instanceof RelationshipCRUDContract ) {
+			throw new InvalidArgumentException( "Relationship {$key} is not a relationship with CRUD. I don't know how to fetch it." );
 		}
 
-		$table = $definition->getTableInterface();
-
-		return wp_list_pluck(
-			$table::get_all_by(
-				$definition->getThisEntityColumn(),
-				$this->getPrimaryValue(),
-				'=',
-				1000
-			),
-			$definition->getOtherEntityColumn()
-		);
+		return $definition->fetchRelationshipData( $this->getPrimaryValue() );
 	}
 
 	/**
@@ -201,7 +223,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	 * @throws InvalidArgumentException If the relationship does not exist.
 	 */
 	public function addToRelationship( string $key, $id ): void {
-		if ( ! $this->getRelationships()->has( $key ) ) {
+		if ( ! $this->getRelationshipCollection()->has( $key ) ) {
 			throw new InvalidArgumentException( "Relationship {$key} does not exist." );
 		}
 
@@ -213,10 +235,10 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 			$this->relationshipData[ $key ]['insert'] = [];
 		}
 
-		$this->relationshipData[ $key ]['insert'][] = $id;
+		$this->relationshipData[ $key ]['insert'][] = $id instanceof LazyModelInterface ? $id->get_id() : $id;
 
 		if ( ! empty( $this->relationshipData[ $key ]['delete'] ) ) {
-			$this->relationshipData[ $key ]['delete'] = array_diff( $this->relationshipData[ $key ]['delete'], [ $id ] );
+			$this->relationshipData[ $key ]['delete'] = array_diff( $this->relationshipData[ $key ]['delete'], [ $id instanceof LazyModelInterface ? $id->get_id() : $id ] );
 		}
 	}
 
@@ -231,7 +253,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	 * @throws InvalidArgumentException If the relationship does not exist.
 	 */
 	public function removeFromRelationship( string $key, $id ): void {
-		if ( ! $this->getRelationships()->has( $key ) ) {
+		if ( ! $this->getRelationshipCollection()->has( $key ) ) {
 			throw new InvalidArgumentException( "Relationship {$key} does not exist." );
 		}
 
@@ -243,10 +265,10 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 			$this->relationshipData[ $key ]['delete'] = [];
 		}
 
-		$this->relationshipData[ $key ]['delete'][] = $id;
+		$this->relationshipData[ $key ]['delete'][] = $id instanceof LazyModelInterface ? $id->get_id() : $id;
 
 		if ( ! empty( $this->relationshipData[ $key ]['insert'] ) ) {
-			$this->relationshipData[ $key ]['insert'] = array_diff( $this->relationshipData[ $key ]['insert'], [ $id ] );
+			$this->relationshipData[ $key ]['insert'] = array_diff( $this->relationshipData[ $key ]['insert'], [ $id instanceof LazyModelInterface ? $id->get_id() : $id ] );
 		}
 	}
 
@@ -259,7 +281,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	 *
 	 * @throws RuntimeException On unknown reserved keyword.
 	 */
-	protected static function generatePropertyDefinitions(): array {
+	protected static function properties(): array {
 		/** @var Table_Schema_Interface $table_schema */
 		$table_schema = static::getTableClass()::get_current_schema();
 
@@ -308,8 +330,6 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 			$property_definitions[ $column->get_name() ] = $definition;
 		}
 
-		static::$properties = $property_definitions;
-
 		return $property_definitions;
 	}
 
@@ -318,23 +338,40 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param string                 $key Relationship name.
-	 * @param Model|list<Model>|null $value The relationship value to cache.
+	 * @param string $key Relationship name.
+	 * @param mixed  $value The relationship value to cache.
 	 *
 	 * @throws InvalidArgumentException If the relationship is not an integer.
 	 */
 	protected function setCachedRelationship( string $key, $value ): void {
-		$relationship = $this->getRelationships()->get( $key );
+		$relationship = $this->getRelationshipCollection()->get( $key );
 
 		if ( ! $relationship ) {
 			throw new InvalidArgumentException( "Relationship '$key' is not defined on this model." );
+		}
+
+		$definition = $relationship->getDefinition();
+		if ( $definition instanceof RelationshipWithLazyMethods ) {
+			$value = $definition->isSingle() ? $definition->toLazy( $value ) : array_map( fn( $v ) => $definition->toLazy( $v ), $value );
+		}
+
+		if ( is_array( $value ) ) {
+			foreach ( $value as $v ) {
+				if ( null === $v || $v instanceof LazyModelInterface || $v instanceof ModelContract ) {
+					continue;
+				}
+
+				throw new InvalidArgumentException( "Each element of the relationship '$key' value must be a Model instance or LazyModelInterface instance or null." );
+			}
+		} elseif ( null !== $value && ! $value instanceof LazyModelInterface && ! $value instanceof ModelContract ) {
+			throw new InvalidArgumentException( "Relationship '$key' value must be a Model instance or LazyModelInterface instance or null." );
 		}
 
 		if ( ! isset( $this->relationshipData[ $key ] ) || ! is_array( $this->relationshipData[ $key ] ) ) {
 			$this->relationshipData[ $key ] = [];
 		}
 
-		$old_value = $relationship->isLoaded() && $relationship->getDefinition()->hasCachingEnabled() ? $relationship->getValue( fn() => true ) : null;
+		$old_value = $relationship->isLoaded() && $definition->hasCachingEnabled() ? $this->getRelationship( $key ) : null;
 		$relationship->setValue( $value );
 
 		if ( $old_value ) {
@@ -364,37 +401,18 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	 * @return void
 	 */
 	private function saveRelationshipData(): void {
-		foreach ( $this->getRelationships()->getAll() as $key => $relationship ) {
+		foreach ( $this->getRelationshipCollection()->getAll() as $key => $relationship ) {
 			$definition = $relationship->getDefinition();
-			if ( ! $definition instanceof ManyToManyWithPostsContract ) {
+			if ( ! $definition instanceof RelationshipCRUDContract ) {
 				continue;
 			}
 
 			if ( ! empty( $this->relationshipData[ $key ]['insert'] ) ) {
-				$insert_data = [];
-				foreach ( $this->relationshipData[ $key ]['insert'] as $insert_id ) {
-					$insert_data[] = [
-						$definition->getThisEntityColumn() => $this->getPrimaryValue(),
-						$definition->getOtherEntityColumn() => $insert_id,
-					];
-				}
-
-				// First delete them to avoid duplicates.
-				$definition->getTableInterface()::delete_many(
-					$this->relationshipData[ $key ]['insert'],
-					$definition->getOtherEntityColumn(),
-					DB::prepare( ' AND %i = %d', $definition->getThisEntityColumn(), $this->getPrimaryValue() )
-				);
-
-				$definition->getTableInterface()::insert_many( $insert_data );
+				$definition->insertRelationshipData( $this->getPrimaryValue(), $this->relationshipData[ $key ]['insert'] );
 			}
 
 			if ( ! empty( $this->relationshipData[ $key ]['delete'] ) ) {
-				$definition->getTableInterface()::delete_many(
-					$this->relationshipData[ $key ]['delete'],
-					$definition->getOtherEntityColumn(),
-					DB::prepare( ' AND %i = %d', $definition->getThisEntityColumn(), $this->getPrimaryValue() )
-				);
+				$definition->deleteRelationshipData( $this->getPrimaryValue(), $this->relationshipData[ $key ]['delete'] );
 			}
 		}
 	}
@@ -404,14 +422,14 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @return int The id of the saved model.
+	 * @return self The saved model.
 	 *
 	 * @throws RuntimeException If the model fails to save.
 	 */
-	public function save(): int {
+	public function save(): self {
 		if ( ! $this->isDirty() ) {
 			$this->saveRelationshipData();
-			return $this->getPrimaryValue();
+			return $this;
 		}
 
 		$result = $this->getTableClass()::upsert( $this->toArray() );
@@ -420,18 +438,26 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 			throw new RuntimeException( __( 'Failed to save the model.', 'stellarwp-schema-models' ) );
 		}
 
-		$id = $this->getPrimaryValue();
-
-		if ( ! $id ) {
-			$id = DB::last_insert_id();
-			$this->setAttribute( $this->getPrimaryColumn(), $id );
+		if ( ! $this->getPrimaryValue() ) {
+			$this->setAttribute( $this->getPrimaryColumn(), DB::last_insert_id() );
 		}
 
 		$this->commitChanges();
 
 		$this->saveRelationshipData();
 
-		return $id;
+		return $this;
+	}
+
+	/**
+	 * Returns the query builder for the model.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return ModelQueryBuilder<static>
+	 */
+	public static function query(): ModelQueryBuilder {
+		return ( new ModelQueryBuilder( static::class ) )->from( static::getTableClass()::table_name( false ) );
 	}
 
 	/**
@@ -463,7 +489,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	 * @return void
 	 */
 	private function deleteAllRelationshipData(): void {
-		$relationships = $this->getRelationships()->getAll();
+		$relationships = $this->getRelationshipCollection()->getAll();
 		if ( empty( $relationships ) ) {
 			return;
 		}
@@ -513,7 +539,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 			$model->setAttribute( $key, static::castValueForProperty( static::getPropertyDefinition( $key ), $data[ $key ], $key ) );
 		}
 
-		foreach ( array_keys( $model->getRelationships()->getAll() ) as $key ) {
+		foreach ( array_keys( $model->getRelationshipCollection()->getAll() ) as $key ) {
 			if ( ! isset( $data[ $key ] ) ) {
 				continue;
 			}

@@ -18,7 +18,7 @@ class SchemaModelTest extends WPTestCase {
 
 		$model = MockModelSchema::fromData( $model_data, 1 );
 		$this->assertTrue( $model->isDirty() );
-		$id = $model->save();
+		$id = $model->save()->getPrimaryValue();
 		$this->assertFalse( $model->isDirty() );
 
 		$this->assertIsInt( $id );
