@@ -11,7 +11,7 @@ declare( strict_types=1 );
 
 namespace StellarWP\SchemaModels\Contracts\Relationships;
 
-use StellarWP\Models\Contracts\Model as ModelContract;
+use StellarWP\Models\Model as ModelContract;
 
 interface RelationshipCRUD {
 	/**
