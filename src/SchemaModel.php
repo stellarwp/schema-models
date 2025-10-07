@@ -17,16 +17,13 @@ use StellarWP\Schema\Tables\Contracts\Table as Table_Interface;
 use StellarWP\Schema\Tables\Contracts\Table_Schema_Interface;
 use RuntimeException;
 use StellarWP\Models\Model;
-use StellarWP\Models\Contracts\Model as ModelContract;
 use StellarWP\Models\ModelPropertyDefinition;
 use StellarWP\Models\ModelRelationshipCollection;
-use StellarWP\SchemaModels\Contracts\Relationships\RelationshipWithLazyMethods;
 use StellarWP\SchemaModels\Contracts\Relationships\RelationshipCRUD as RelationshipCRUDContract;
 use StellarWP\Schema\Columns\Contracts\Column;
 use DateTime;
 use DateTimeInterface;
 use StellarWP\Models\ModelQueryBuilder;
-use StellarWP\Models\Contracts\LazyModel as LazyModelInterface;
 use StellarWP\Models\ModelRelationshipDefinition;
 
 /**
@@ -200,7 +197,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	 *
 	 * @param string $key Relationship name.
 	 *
-	 * @return Model|Model[]|LazyModelInterface|LazyModelInterface[]|null
+	 * @return Model|Model[]|null
 	 *
 	 * @throws InvalidArgumentException If the relationship is not a relationship with CRUD.
 	 */
@@ -238,10 +235,10 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 			$this->relationshipData[ $key ]['insert'] = [];
 		}
 
-		$this->relationshipData[ $key ]['insert'][] = $id instanceof LazyModelInterface ? $id->get_id() : $id;
+		$this->relationshipData[ $key ]['insert'][] = $id;
 
 		if ( ! empty( $this->relationshipData[ $key ]['delete'] ) ) {
-			$this->relationshipData[ $key ]['delete'] = array_diff( $this->relationshipData[ $key ]['delete'], [ $id instanceof LazyModelInterface ? $id->get_id() : $id ] );
+			$this->relationshipData[ $key ]['delete'] = array_diff( $this->relationshipData[ $key ]['delete'], [ $id ] );
 		}
 	}
 
@@ -268,10 +265,10 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 			$this->relationshipData[ $key ]['delete'] = [];
 		}
 
-		$this->relationshipData[ $key ]['delete'][] = $id instanceof LazyModelInterface ? $id->get_id() : $id;
+		$this->relationshipData[ $key ]['delete'][] = $id;
 
 		if ( ! empty( $this->relationshipData[ $key ]['insert'] ) ) {
-			$this->relationshipData[ $key ]['insert'] = array_diff( $this->relationshipData[ $key ]['insert'], [ $id instanceof LazyModelInterface ? $id->get_id() : $id ] );
+			$this->relationshipData[ $key ]['insert'] = array_diff( $this->relationshipData[ $key ]['insert'], [ $id ] );
 		}
 	}
 
@@ -334,66 +331,6 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 		}
 
 		return $property_definitions;
-	}
-
-	/**
-	 * Updates the cached value for a given relationship.
-	 *
-	 * @since 0.1.0
-	 *
-	 * @param string $key Relationship name.
-	 * @param mixed  $value The relationship value to cache.
-	 *
-	 * @throws InvalidArgumentException If the relationship is not an integer.
-	 */
-	protected function setCachedRelationship( string $key, $value ): void {
-		$relationship = $this->getRelationshipCollection()->get( $key );
-
-		if ( ! $relationship ) {
-			throw new InvalidArgumentException( "Relationship '$key' is not defined on this model." );
-		}
-
-		$definition = $relationship->getDefinition();
-		if ( $definition instanceof RelationshipWithLazyMethods ) {
-			$value = $definition->isSingle() ? $definition->toLazy( $value ) : array_map( fn( $v ) => $definition->toLazy( $v ), $value );
-		}
-
-		if ( is_array( $value ) ) {
-			foreach ( $value as $v ) {
-				if ( null === $v || $v instanceof LazyModelInterface || $v instanceof ModelContract ) {
-					continue;
-				}
-
-				throw new InvalidArgumentException( "Each element of the relationship '$key' value must be a Model instance or LazyModelInterface instance or null." );
-			}
-		} elseif ( null !== $value && ! $value instanceof LazyModelInterface && ! $value instanceof ModelContract ) {
-			throw new InvalidArgumentException( "Relationship '$key' value must be a Model instance or LazyModelInterface instance or null." );
-		}
-
-		if ( ! isset( $this->relationshipData[ $key ] ) || ! is_array( $this->relationshipData[ $key ] ) ) {
-			$this->relationshipData[ $key ] = [];
-		}
-
-		$old_value = $relationship->isLoaded() && $definition->hasCachingEnabled() ? $this->getRelationship( $key ) : null;
-		$relationship->setValue( $value );
-
-		if ( $old_value ) {
-			if ( is_array( $old_value ) ) {
-				foreach ( $old_value as $i ) {
-					$this->removeFromRelationship( $key, $i instanceof self ? $i->getPrimaryValue() : $i );
-				}
-			} else {
-				$this->removeFromRelationship( $key, $old_value instanceof self ? $old_value->getPrimaryValue() : $old_value );
-			}
-		}
-
-		if ( is_array( $value ) ) {
-			foreach ( $value as $i ) {
-				$this->addToRelationship( $key, $i instanceof self ? $i->getPrimaryValue() : $i );
-			}
-		} else {
-			$this->addToRelationship( $key, $value instanceof self ? $value->getPrimaryValue() : $value );
-		}
 	}
 
 	/**
@@ -483,6 +420,52 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 
 		return $this->getTableClass()::delete( $uid );
 	}
+
+	/**
+	 * Updates the cached value for a given relationship.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param string $key Relationship name.
+	 * @param mixed  $value The relationship value to cache.
+	 *
+	 * @throws InvalidArgumentException If the relationship is not an integer.
+	 */
+	public function setCachedRelationship( string $key, $value ): void {
+		$relationship = $this->getRelationshipCollection()->get( $key );
+
+		if ( ! $relationship ) {
+			throw new InvalidArgumentException( "Relationship '$key' is not defined on this model." );
+		}
+
+		$definition = $relationship->getDefinition();
+
+		if ( ! isset( $this->relationshipData[ $key ] ) || ! is_array( $this->relationshipData[ $key ] ) ) {
+			$this->relationshipData[ $key ] = [];
+		}
+
+		$old_value = $relationship->isLoaded() && $definition->hasCachingEnabled() ? $this->getRelationship( $key ) : null;
+		parent::setCachedRelationship( $key, $value );
+
+		if ( $old_value ) {
+			if ( is_array( $old_value ) ) {
+				foreach ( $old_value as $i ) {
+					$this->removeFromRelationship( $key, $i instanceof self ? $i->getPrimaryValue() : $i );
+				}
+			} else {
+				$this->removeFromRelationship( $key, $old_value instanceof self ? $old_value->getPrimaryValue() : $old_value );
+			}
+		}
+
+		if ( is_array( $value ) ) {
+			foreach ( $value as $i ) {
+				$this->addToRelationship( $key, $i instanceof self ? $i->getPrimaryValue() : $i );
+			}
+		} else {
+			$this->addToRelationship( $key, $value instanceof self ? $value->getPrimaryValue() : $value );
+		}
+	}
+
 
 	/**
 	 * Deletes all the relationship data.

@@ -20,7 +20,7 @@ use StellarWP\Schema\Tables\Contracts\Table as Table_Interface;
  *
  * @package StellarWP\SchemaModels\Contracts\Relationships;
  */
-interface ManyToManyWithPosts extends RelationshipWithLazyMethods, RelationshipCRUD {
+interface ManyToManyWithPosts extends RelationshipCRUD {
 	/**
 	 * Sets the this entity column.
 	 *

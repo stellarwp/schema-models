@@ -36,12 +36,12 @@ class SchemaModelRelationshipsTest extends WPTestCase {
 		$this->assertEquals( $model_data['int'], $model->get_int() );
 		$this->assertEquals( $model_data['date'], $model->get_date() );
 
-		$postModels = $model->get_posts();
-		$this->assertCount( 2, $postModels );
-		$this->assertInstanceOf( WPPostModel::class, $postModels[0] );
-		$this->assertInstanceOf( WPPostModel::class, $postModels[1] );
-		$this->assertEquals( $post_id_1, $postModels[0]->getAttribute('ID') );
-		$this->assertEquals( $post_id_2, $postModels[1]->getAttribute('ID') );
+		$posts = $model->get_posts();
+		$this->assertCount( 2, $posts );
+		$this->assertInstanceOf( \WP_Post::class, $posts[0] );
+		$this->assertInstanceOf( \WP_Post::class, $posts[1] );
+		$this->assertEquals( $post_id_1, $posts[0]->ID );
+		$this->assertEquals( $post_id_2, $posts[1]->ID );
 	}
 
 	public function test_queries_returns_models() {
@@ -110,9 +110,9 @@ class SchemaModelRelationshipsTest extends WPTestCase {
 		$this->assertEquals( $models[0]->get_date(), $results[0]->get_date() );
 		$this->assertEquals( $models[1]->get_date(), $results[1]->get_date() );
 		$this->assertEquals( $models[2]->get_date(), $results[2]->get_date() );
-		$this->assertEquals( array_map(fn($post) => $post->getAttribute('ID'), $models[0]->get_posts()), array_map(fn($post) => $post->getAttribute('ID'), $results[0]->get_posts()) );
-		$this->assertEquals( array_map(fn($post) => $post->getAttribute('ID'), $models[1]->get_posts()), array_map(fn($post) => $post->getAttribute('ID'), $results[1]->get_posts()) );
-		$this->assertEquals( array_map(fn($post) => $post->getAttribute('ID'), $models[2]->get_posts()), array_map(fn($post) => $post->getAttribute('ID'), $results[2]->get_posts()) );
+		$this->assertEquals( array_map(fn($post) => $post->ID, $models[0]->get_posts()), array_map(fn($post) => $post->ID, $results[0]->get_posts()) );
+		$this->assertEquals( array_map(fn($post) => $post->ID, $models[1]->get_posts()), array_map(fn($post) => $post->ID, $results[1]->get_posts()) );
+		$this->assertEquals( array_map(fn($post) => $post->ID, $models[2]->get_posts()), array_map(fn($post) => $post->ID, $results[2]->get_posts()) );
 	}
 
 	public function test_delete() {

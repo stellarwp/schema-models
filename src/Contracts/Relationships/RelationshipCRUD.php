@@ -11,7 +11,6 @@ declare( strict_types=1 );
 
 namespace StellarWP\SchemaModels\Contracts\Relationships;
 
-use StellarWP\Models\Contracts\LazyModel as LazyModelInterface;
 use StellarWP\Models\Contracts\Model as ModelContract;
 
 interface RelationshipCRUD {
@@ -31,7 +30,7 @@ interface RelationshipCRUD {
 	 *
 	 * @param mixed $id The ID of the relationship.
 	 *
-	 * @return ModelContract|ModelContract[]|LazyModelInterface|LazyModelInterface[]|null
+	 * @return ModelContract|ModelContract[]|null
 	 */
 	public function fetchRelationshipData( $id );
 

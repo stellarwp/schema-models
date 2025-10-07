@@ -14,8 +14,6 @@ namespace StellarWP\SchemaModels\Relationships;
 use StellarWP\Models\ModelRelationshipDefinition;
 use StellarWP\Schema\Tables\Contracts\Table as Table_Interface;
 use StellarWP\SchemaModels\Contracts\Relationships\ManyToManyWithPosts as ManyToManyWithPostsContract;
-use StellarWP\Models\LazyWPPostModel;
-use StellarWP\Models\Contracts\LazyModel as LazyModelInterface;
 use StellarWP\DB\DB;
 
 /**
@@ -169,8 +167,10 @@ class ManyToManyWithPosts extends ModelRelationshipDefinition implements ManyToM
 	public function fetchRelationshipData( $id ) {
 		$table = $this->getTableInterface();
 
+		$sanitizer = $this->getValidateSanitizeRelationshipWith();
+
 		return array_map(
-			fn( $id ) => new LazyWPPostModel( $id ),
+			fn( $id ) => $sanitizer( $id ),
 			wp_list_pluck(
 				$table::get_all_by(
 					$this->getThisEntityColumn(),
@@ -228,28 +228,5 @@ class ManyToManyWithPosts extends ModelRelationshipDefinition implements ManyToM
 			$this->getOtherEntityColumn(),
 			DB::prepare( ' AND %i = %d', $this->getThisEntityColumn(), $id )
 		);
-	}
-
-	/**
-	 * Converts a value to a lazy model.
-	 *
-	 * @since 0.1.0
-	 *
-	 * @param mixed $value The value to convert.
-	 *
-	 * @return ?LazyModelInterface
-	 */
-	public function toLazy( $value ): ?LazyModelInterface {
-		if ( $value instanceof LazyModelInterface ) {
-			return $value;
-		}
-
-		$value = intval( $value );
-
-		if ( ! $value ) {
-			return null;
-		}
-
-		return new LazyWPPostModel( $value );
 	}
 }
