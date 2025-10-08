@@ -34,7 +34,7 @@
   "minimum-stability": "stable",
   "require": {
     "php": ">=7.4",
-    "stellarwp/models": "dev-feat/more-flexibility-on-defining-relationships-and-its-values",
+    "stellarwp/models": "^2.0.0",
     "stellarwp/schema": "^3.1.2"
   },
   "require-dev": {
