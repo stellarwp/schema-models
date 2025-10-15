@@ -228,7 +228,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 		 * @param SchemaModel $this The model.
 		 * @param string $key The key of the relationship.
 		 */
-		do_action( "stellarwp_schema_models_pre_delete_relationship", $this, $key );
+		do_action( 'stellarwp_schema_models_pre_delete_relationship', $this, $key );
 
 		$definition->deleteAllRelationshipData( $this->getPrimaryValue() );
 
@@ -260,7 +260,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 		 * @param SchemaModel $this The model.
 		 * @param string $key The key of the relationship.
 		 */
-		do_action( "stellarwp_schema_models_post_delete_relationship", $this, $key );
+		do_action( 'stellarwp_schema_models_post_delete_relationship', $this, $key );
 	}
 
 	/**
