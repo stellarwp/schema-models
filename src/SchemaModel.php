@@ -112,6 +112,17 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	}
 
 	/**
+	 * Returns the object vars.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return array<string,mixed>
+	 */
+	public function jsonSerialize(): array {
+		return $this->toArray();
+	}
+
+	/**
 	 * Gets the primary column of the model.
 	 *
 	 * @since 0.1.0
@@ -187,7 +198,69 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 			throw new InvalidArgumentException( "Relationship {$key} is not a relationship with CRUD." );
 		}
 
+		$class = get_class( $this );
+
+		/**
+		 * Fires before the relationship data is deleted.
+		 *
+		 * @since 0.1.0
+		 *
+		 * @param SchemaModel $this The model.
+		 * @param string $key The key of the relationship.
+		 */
+		do_action( "stellarwp_schema_models_pre_delete_relationship_{$key}_{$class}", $this, $key );
+
+		/**
+		 * Fires before the relationship data is deleted.
+		 *
+		 * @since 0.1.0
+		 *
+		 * @param SchemaModel $this The model.
+		 * @param string $key The key of the relationship.
+		 */
+		do_action( "stellarwp_schema_models_pre_delete_relationship_{$key}", $this, $key );
+
+		/**
+		 * Fires before the relationship data is deleted.
+		 *
+		 * @since 0.1.0
+		 *
+		 * @param SchemaModel $this The model.
+		 * @param string $key The key of the relationship.
+		 */
+		do_action( "stellarwp_schema_models_pre_delete_relationship", $this, $key );
+
 		$definition->deleteAllRelationshipData( $this->getPrimaryValue() );
+
+		/**
+		 * Fires after the relationship data is deleted.
+		 *
+		 * @since 0.1.0
+		 *
+		 * @param SchemaModel $this The model.
+		 * @param string $key The key of the relationship.
+		 */
+		do_action( "stellarwp_schema_models_post_delete_relationship_{$key}_{$class}", $this, $key );
+
+		/**
+		 * Fires after the relationship data is deleted.
+		 *
+		 * @since 0.1.0
+		 *
+		 * @param SchemaModel $this The model.
+		 * @param string $key The key of the relationship.
+		 */
+		do_action( "stellarwp_schema_models_post_delete_relationship_{$key}", $this, $key );
+
+		/**
+		 * Fires after the relationship data is deleted.
+		 *
+		 * @since 0.1.0
+		 *
+		 * @param SchemaModel $this The model.
+		 * @param string $key The key of the relationship.
+		 */
+		do_action( "stellarwp_schema_models_post_delete_relationship", $this, $key );
 	}
 
 	/**
@@ -367,8 +440,45 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	 * @throws RuntimeException If the model fails to save.
 	 */
 	public function save(): self {
+		$class = get_class( $this );
+		/**
+		 * Fires before the model is saved.
+		 *
+		 * @since 0.1.0
+		 *
+		 * @param SchemaModel $this The model.
+		 */
+		do_action( "stellarwp_schema_models_pre_save_{$class}", $this );
+
+		/**
+		 * Fires before the model is saved.
+		 *
+		 * @since 0.1.0
+		 *
+		 * @param SchemaModel $this The model.
+		 */
+		do_action( 'stellarwp_schema_models_pre_save', $this );
+
 		if ( ! $this->isDirty() ) {
 			$this->saveRelationshipData();
+
+			/**
+			 * Fires after the model is saved.
+			 *
+			 * @since 0.1.0
+			 *
+			 * @param SchemaModel $this The model.
+			 */
+			do_action( "stellarwp_schema_models_post_save_{$class}", $this );
+
+			/**
+			 * Fires after the model is saved.
+			 *
+			 * @since 0.1.0
+			 *
+			 * @param SchemaModel $this The model.
+			 */
+			do_action( 'stellarwp_schema_models_post_save', $this );
 			return $this;
 		}
 
@@ -385,6 +495,24 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 		$this->commitChanges();
 
 		$this->saveRelationshipData();
+
+		/**
+		 * Fires after the model is saved.
+		 *
+		 * @since 0.1.0
+		 *
+		 * @param SchemaModel $this The model.
+		 */
+		do_action( "stellarwp_schema_models_post_save_{$class}", $this );
+
+		/**
+		 * Fires after the model is saved.
+		 *
+		 * @since 0.1.0
+		 *
+		 * @param SchemaModel $this The model.
+		 */
+		do_action( 'stellarwp_schema_models_post_save', $this );
 
 		return $this;
 	}
@@ -416,9 +544,49 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 			throw new RuntimeException( __( 'Model ID is required to delete the model.', 'stellarwp-schema-models' ) );
 		}
 
+		$class = get_class( $this );
+
+		/**
+		 * Fires before the model is deleted.
+		 *
+		 * @since 0.1.0
+		 *
+		 * @param SchemaModel $this The model.
+		 */
+		do_action( "stellarwp_schema_models_pre_delete_{$class}", $this );
+
+		/**
+		 * Fires before the model is deleted.
+		 *
+		 * @since 0.1.0
+		 *
+		 * @param SchemaModel $this The model.
+		 */
+		do_action( 'stellarwp_schema_models_pre_delete', $this );
+
 		$this->deleteAllRelationshipData();
 
-		return $this->getTableClass()::delete( $uid );
+		$result = $this->getTableClass()::delete( $uid );
+
+		/**
+		 * Fires after the model is deleted.
+		 *
+		 * @since 0.1.0
+		 *
+		 * @param SchemaModel $this The model.
+		 */
+		do_action( "stellarwp_schema_models_post_delete_{$class}", $this );
+
+		/**
+		 * Fires after the model is deleted.
+		 *
+		 * @since 0.1.0
+		 *
+		 * @param SchemaModel $this The model.
+		 */
+		do_action( 'stellarwp_schema_models_post_delete', $this );
+
+		return $result;
 	}
 
 	/**
