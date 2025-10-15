@@ -205,8 +205,8 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 		 *
 		 * @since 0.1.0
 		 *
-		 * @param SchemaModel $this The model.
-		 * @param string $key The key of the relationship.
+		 * @param SchemaModel $model The model.
+		 * @param string      $key   The key of the relationship.
 		 */
 		do_action( "stellarwp_schema_models_pre_delete_relationship_{$key}_{$class}", $this, $key );
 
@@ -215,8 +215,8 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 		 *
 		 * @since 0.1.0
 		 *
-		 * @param SchemaModel $this The model.
-		 * @param string $key The key of the relationship.
+		 * @param SchemaModel $model The model.
+		 * @param string      $key   The key of the relationship.
 		 */
 		do_action( "stellarwp_schema_models_pre_delete_relationship_{$key}", $this, $key );
 
@@ -225,8 +225,8 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 		 *
 		 * @since 0.1.0
 		 *
-		 * @param SchemaModel $this The model.
-		 * @param string $key The key of the relationship.
+		 * @param SchemaModel $model The model.
+		 * @param string      $key   The key of the relationship.
 		 */
 		do_action( 'stellarwp_schema_models_pre_delete_relationship', $this, $key );
 
@@ -237,8 +237,8 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 		 *
 		 * @since 0.1.0
 		 *
-		 * @param SchemaModel $this The model.
-		 * @param string $key The key of the relationship.
+		 * @param SchemaModel $model The model.
+		 * @param string      $key   The key of the relationship.
 		 */
 		do_action( "stellarwp_schema_models_post_delete_relationship_{$key}_{$class}", $this, $key );
 
@@ -247,8 +247,8 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 		 *
 		 * @since 0.1.0
 		 *
-		 * @param SchemaModel $this The model.
-		 * @param string $key The key of the relationship.
+		 * @param SchemaModel $model The model.
+		 * @param string      $key   The key of the relationship.
 		 */
 		do_action( "stellarwp_schema_models_post_delete_relationship_{$key}", $this, $key );
 
@@ -257,8 +257,8 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 		 *
 		 * @since 0.1.0
 		 *
-		 * @param SchemaModel $this The model.
-		 * @param string $key The key of the relationship.
+		 * @param SchemaModel $model The model.
+		 * @param string      $key   The key of the relationship.
 		 */
 		do_action( 'stellarwp_schema_models_post_delete_relationship', $this, $key );
 	}
@@ -446,7 +446,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 		 *
 		 * @since 0.1.0
 		 *
-		 * @param SchemaModel $this The model.
+		 * @param SchemaModel $model The model.
 		 */
 		do_action( "stellarwp_schema_models_pre_save_{$class}", $this );
 
@@ -455,7 +455,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 		 *
 		 * @since 0.1.0
 		 *
-		 * @param SchemaModel $this The model.
+		 * @param SchemaModel $model The model.
 		 */
 		do_action( 'stellarwp_schema_models_pre_save', $this );
 
@@ -467,7 +467,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 			 *
 			 * @since 0.1.0
 			 *
-			 * @param SchemaModel $this The model.
+			 * @param SchemaModel $model The model.
 			 */
 			do_action( "stellarwp_schema_models_post_save_{$class}", $this );
 
@@ -476,7 +476,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 			 *
 			 * @since 0.1.0
 			 *
-			 * @param SchemaModel $this The model.
+			 * @param SchemaModel $model The model.
 			 */
 			do_action( 'stellarwp_schema_models_post_save', $this );
 			return $this;
@@ -501,7 +501,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 		 *
 		 * @since 0.1.0
 		 *
-		 * @param SchemaModel $this The model.
+		 * @param SchemaModel $model The model.
 		 */
 		do_action( "stellarwp_schema_models_post_save_{$class}", $this );
 
@@ -510,7 +510,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 		 *
 		 * @since 0.1.0
 		 *
-		 * @param SchemaModel $this The model.
+		 * @param SchemaModel $model The model.
 		 */
 		do_action( 'stellarwp_schema_models_post_save', $this );
 
@@ -551,7 +551,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 		 *
 		 * @since 0.1.0
 		 *
-		 * @param SchemaModel $this The model.
+		 * @param SchemaModel $model The model.
 		 */
 		do_action( "stellarwp_schema_models_pre_delete_{$class}", $this );
 
@@ -560,7 +560,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 		 *
 		 * @since 0.1.0
 		 *
-		 * @param SchemaModel $this The model.
+		 * @param SchemaModel $model The model.
 		 */
 		do_action( 'stellarwp_schema_models_pre_delete', $this );
 
@@ -573,7 +573,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 		 *
 		 * @since 0.1.0
 		 *
-		 * @param SchemaModel $this The model.
+		 * @param SchemaModel $model The model.
 		 */
 		do_action( "stellarwp_schema_models_post_delete_{$class}", $this );
 
@@ -582,7 +582,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 		 *
 		 * @since 0.1.0
 		 *
-		 * @param SchemaModel $this The model.
+		 * @param SchemaModel $model The model.
 		 */
 		do_action( 'stellarwp_schema_models_post_delete', $this );
 
