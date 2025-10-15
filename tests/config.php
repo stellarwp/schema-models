@@ -1,7 +1,7 @@
 <?php
 $slic = getenv( 'STELLAR_SLIC' );
 
-// Paths
+// Paths.
 $constants = [
 	'WP_CONTENT_DIR' => getenv( 'WP_ROOT_FOLDER' ) . '/wp-content',
 	'ABSPATH'        => getenv( 'WP_ROOT_FOLDER' ) . '/',
