@@ -189,7 +189,7 @@ class ManyToManyWithPosts extends ModelRelationshipDefinition implements ManyToM
 	 * @since 0.1.0
 	 *
 	 * @param string|int $id The ID of the relationship.
-	 * @param array $data    The data to insert.
+	 * @param array      $data    The data to insert.
 	 */
 	public function insertRelationshipData( $id, array $data = [] ): void {
 		if ( empty( $data ) ) {
