@@ -597,7 +597,7 @@ abstract class SchemaModel extends Model implements SchemaModelInterface {
 	 * @param string $key Relationship name.
 	 * @param mixed  $value The relationship value to cache.
 	 *
-	 * @throws InvalidArgumentException If the relationship is not an integer.
+	 * @throws InvalidArgumentException If the relationship is not defined on the model.
 	 */
 	public function setCachedRelationship( string $key, $value ): void {
 		$relationship = $this->getRelationshipCollection()->get( $key );

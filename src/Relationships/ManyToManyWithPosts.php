@@ -188,8 +188,8 @@ class ManyToManyWithPosts extends ModelRelationshipDefinition implements ManyToM
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param mixed $id   The ID of the relationship.
-	 * @param array $data The data to insert.
+	 * @param string|int $id The ID of the relationship.
+	 * @param array $data    The data to insert.
 	 */
 	public function insertRelationshipData( $id, array $data = [] ): void {
 		if ( empty( $data ) ) {
@@ -219,8 +219,8 @@ class ManyToManyWithPosts extends ModelRelationshipDefinition implements ManyToM
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param mixed $id The ID of the relationship.
-	 * @param array $data The data to delete.
+	 * @param string|int $id   The ID of the relationship.
+	 * @param array      $data The data to delete.
 	 */
 	public function deleteRelationshipData( $id, $data ): void {
 		$this->getTableInterface()::delete_many(
