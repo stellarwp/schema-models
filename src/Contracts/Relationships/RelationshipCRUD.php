@@ -19,7 +19,7 @@ interface RelationshipCRUD {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param mixed $id The ID of the relationship.
+	 * @param string|int $id The ID of the relationship.
 	 */
 	public function deleteAllRelationshipData( $id ): void;
 
@@ -28,7 +28,7 @@ interface RelationshipCRUD {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param mixed $id The ID of the relationship.
+	 * @param string|int $id The ID of the relationship.
 	 *
 	 * @return ModelContract|ModelContract[]|null
 	 */

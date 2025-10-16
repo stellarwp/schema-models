@@ -151,7 +151,7 @@ class ManyToManyWithPosts extends ModelRelationshipDefinition implements ManyToM
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param mixed $id The ID of the relationship.
+	 * @param string|int $id The ID of the relationship.
 	 */
 	public function deleteAllRelationshipData( $id ): void {
 		$this->getTableInterface()::delete( $id, $this->getThisEntityColumn() );
@@ -162,7 +162,9 @@ class ManyToManyWithPosts extends ModelRelationshipDefinition implements ManyToM
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param mixed $id The ID of the relationship.
+	 * @param string|int $id The ID of the relationship.
+	 *
+	 * @return array
 	 */
 	public function fetchRelationshipData( $id ) {
 		$table = $this->getTableInterface();
